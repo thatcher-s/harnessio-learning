@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+
+# Delete old zips
+rm *.zip
+
+# Create demo_function.zip
+cd demo_function
+zip -r ../demo_function.zip *
