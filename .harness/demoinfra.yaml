@@ -1,0 +1,13 @@
+infrastructureDefinition:
+  name: demo-infra
+  identifier: demoinfra
+  orgIdentifier: default
+  projectIdentifier: default_project
+  environmentRef: demo
+  deploymentType: AwsLambda
+  type: AwsLambda
+  spec:
+    connectorRef: account.demoawsconnector
+    region: us-east-1
+  allowSimultaneousDeployments: false
+  scopedServices: []
