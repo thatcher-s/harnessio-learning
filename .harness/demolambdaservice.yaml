@@ -17,6 +17,17 @@ service:
                   paths:
                     - AWS-Lambda-Function-Definition.yaml
                   branch: main
+      artifacts:
+        primary:
+          primaryArtifactRef: lambdaS3
+          sources:
+            - spec:
+                connectorRef: account.demoawsconnector
+                bucketName: demo-harness-lambda-bucket
+                region: us-east-1
+                filePath: demo_lambda.zip
+              identifier: lambdaS3
+              type: AmazonS3
   gitOpsEnabled: false
   orgIdentifier: default
   projectIdentifier: default_project
