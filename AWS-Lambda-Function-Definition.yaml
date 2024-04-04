@@ -1,0 +1,7 @@
+# Following are the minimum set of parameters required to create an AWS Lambda Function Definition.
+# Please make sure your uploaded manifest file includes all of them.
+
+functionName: demo_function
+handler: demo_function.handler
+role: arn:aws:iam::050012553741:role/demo-lambda-role
+runtime: python3.12
