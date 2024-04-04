@@ -1,5 +1,5 @@
 environment:
-  name: demo
+  name: demo-environment
   identifier: demo
   description: ""
   tags: {}
