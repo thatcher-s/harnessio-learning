@@ -1,0 +1,9 @@
+service:
+  name: demo-lambda-service
+  identifier: demolambdaservice
+  serviceDefinition:
+    type: AwsLambda
+    spec: {}
+  gitOpsEnabled: false
+  orgIdentifier: default
+  projectIdentifier: default_project
