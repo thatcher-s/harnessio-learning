@@ -3,7 +3,20 @@ service:
   identifier: demolambdaservice
   serviceDefinition:
     type: AwsLambda
-    spec: {}
+    spec:
+      manifests:
+        - manifest:
+            identifier: lambdamanifest
+            type: AwsLambdaFunctionDefinition
+            spec:
+              store:
+                type: Github
+                spec:
+                  connectorRef: account.demogithubconnector
+                  gitFetchType: Branch
+                  paths:
+                    - AWS-Lambda-Function-Definition.yaml
+                  branch: main
   gitOpsEnabled: false
   orgIdentifier: default
   projectIdentifier: default_project
