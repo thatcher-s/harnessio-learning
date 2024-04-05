@@ -1,0 +1,8 @@
+environment:
+  name: demo-app-environment
+  identifier: demoappenvironment
+  description: ""
+  tags: {}
+  type: PreProduction
+  orgIdentifier: default
+  projectIdentifier: default_project
