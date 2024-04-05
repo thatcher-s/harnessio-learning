@@ -46,7 +46,7 @@ pipeline:
                       workspace: demo
                       exportTerraformHumanReadablePlan: true
                       skipRefreshCommand: false
-                  timeout: 10m
+                  timeout: 3m
               - step:
                   type: TerraformApply
                   name: Apply
@@ -55,7 +55,7 @@ pipeline:
                     provisionerIdentifier: terraform_plan
                     configuration:
                       type: InheritFromPlan
-                  timeout: 10m
+                  timeout: 3m
           environment:
             environmentRef: demoterraformenvironment
             gitBranch: main
