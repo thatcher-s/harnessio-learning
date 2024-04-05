@@ -41,7 +41,7 @@ pipeline:
                         providerCredential:
                           type: Aws
                           spec:
-                            connectorRef: account.demoawsconnector
+                            connectorRef: account.demoawsconnectorharness
                             region: us-east-1
                             roleArn: ""
                         varFiles:
@@ -82,7 +82,7 @@ pipeline:
                       configuration:
                         type: InheritFromPlan
                         encryptOutput:
-                          outputSecretManagerRef: account.harnessSecretManager
+                          outputSecretManagerRef: harnessSecretManager
               rollbackSteps:
                 - step:
                     type: TerraformRollback
