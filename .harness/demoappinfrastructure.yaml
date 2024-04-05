@@ -7,7 +7,7 @@ infrastructureDefinition:
   deploymentType: Kubernetes
   type: KubernetesAws
   spec:
-    connectorRef: account.demoawsconnector
+    connectorRef: account.demoawsconnectorharness
     cluster: us-east-1/demo-app-cluster
     namespace: default
     releaseName: release-<+INFRA_KEY_SHORT_ID>
