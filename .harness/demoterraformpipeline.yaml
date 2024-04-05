@@ -29,6 +29,8 @@ pipeline:
                             branch: main
                             folderPath: terraform
                           type: Github
+                        moduleSource:
+                          useConnectorCredentials: true
                       providerCredential:
                         type: Aws
                         spec:
