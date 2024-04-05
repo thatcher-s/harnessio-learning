@@ -37,14 +37,15 @@ pipeline:
                           roleArn: ""
                       environmentVariables:
                         - name: TF_VAR_access_key
-                          value: <+secrets.getValue("demo-aws-access-key")>
+                          value: <+secrets.getValue("account.demo-aws-access-key")>
                           type: String
                         - name: TF_VAR_secret_key
-                          value: <+secrets.getValue("demo-aws-secret-key")>
+                          value: <+secrets.getValue("account.demo-aws-secret-key")>
                           type: String
                       secretManagerRef: account.harnessSecretManager
                       workspace: demo
                       exportTerraformHumanReadablePlan: true
+                      skipRefreshCommand: false
                   timeout: 10m
               - step:
                   type: TerraformApply
