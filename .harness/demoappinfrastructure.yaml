@@ -1,0 +1,16 @@
+infrastructureDefinition:
+  name: demo-app-infrastructure
+  identifier: demoappinfrastructure
+  orgIdentifier: default
+  projectIdentifier: default_project
+  environmentRef: demoappenvironment
+  deploymentType: Kubernetes
+  type: KubernetesAws
+  spec:
+    connectorRef: account.demoawsconnector
+    cluster: us-east-1/demo-app-cluster
+    namespace: default
+    releaseName: release-<+INFRA_KEY_SHORT_ID>
+    provisioner: <+input>
+    region: us-east-1
+  allowSimultaneousDeployments: false
