@@ -11,6 +11,5 @@ infrastructureDefinition:
     cluster: us-east-1/demo-app-cluster
     namespace: default
     releaseName: release-<+INFRA_KEY_SHORT_ID>
-    provisioner: <+input>
     region: us-east-1
   allowSimultaneousDeployments: false
