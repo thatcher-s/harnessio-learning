@@ -1,0 +1,67 @@
+pipeline:
+  name: demo-terraform-pipeline
+  identifier: demoterraformpipeline
+  projectIdentifier: default_project
+  orgIdentifier: default
+  tags: {}
+  stages:
+    - stage:
+        name: Terraform Deployment
+        identifier: Terraform_Custom
+        description: ""
+        type: Custom
+        spec:
+          execution:
+            steps:
+              - step:
+                  type: TerraformPlan
+                  name: Plan
+                  identifier: Plan
+                  spec:
+                    provisionerIdentifier: terraform_plan
+                    configuration:
+                      command: Apply
+                      configFiles:
+                        store:
+                          spec:
+                            connectorRef: account.demogithubconnector
+                            gitFetchType: Branch
+                            branch: main
+                            folderPath: terraform
+                          type: Github
+                      providerCredential:
+                        type: Aws
+                        spec:
+                          connectorRef: account.demoawsconnectorharness
+                          region: us-east-1
+                          roleArn: ""
+                      environmentVariables:
+                        - name: TF_VAR_access_key
+                          value: <+secrets.getValue("demo-aws-access-key")>
+                          type: String
+                        - name: TF_VAR_secret_key
+                          value: <+secrets.getValue("demo-aws-secret-key")>
+                          type: String
+                      secretManagerRef: account.harnessSecretManager
+                      workspace: demo
+                      exportTerraformHumanReadablePlan: true
+                  timeout: 10m
+              - step:
+                  type: TerraformApply
+                  name: Apply
+                  identifier: Apply
+                  spec:
+                    provisionerIdentifier: terraform_plan
+                    configuration:
+                      type: InheritFromPlan
+                  timeout: 10m
+          environment:
+            environmentRef: demoterraformenvironment
+            gitBranch: main
+            deployToAll: false
+        tags: {}
+  properties:
+    ci:
+      codebase:
+        connectorRef: account.demogithubconnector
+        build: <+input>
