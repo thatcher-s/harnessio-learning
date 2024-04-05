@@ -48,8 +48,8 @@ pipeline:
                           - varFile:
                               spec:
                                 content: |-
-                                  access_key=<+secrets.getValue("account.demo_aws_access_key")>
-                                  secret_key=<+secrets.getValue("account.demo_aws_secret_key")>
+                                  access_key=<+secrets.getValue("demo_aws_access_key")>
+                                  secret_key=<+secrets.getValue("demo_aws_secret_key")>
                               identifier: tfvars
                               type: Inline
                         secretManagerRef: account.harnessSecretManager
