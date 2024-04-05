@@ -174,11 +174,6 @@ pipeline:
                       skipRefreshCommand: false
             infrastructureDefinitions:
               - identifier: demoappinfrastructure
-                inputs:
-                  identifier: demoappinfrastructure
-                  type: KubernetesAws
-                  spec:
-                    provisioner: <+input>
           execution:
             steps:
               - step:
