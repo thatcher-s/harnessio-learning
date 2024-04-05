@@ -1,0 +1,211 @@
+pipeline:
+  name: demo-app
+  identifier: demoapp
+  projectIdentifier: default_project
+  orgIdentifier: default
+  tags: {}
+  stages:
+    - stage:
+        name: Infrastructure
+        identifier: Infrastructure
+        description: ""
+        type: Custom
+        spec:
+          execution:
+            steps:
+              - step:
+                  type: ShellScript
+                  name: Terraform Init
+                  identifier: Terraform_Init
+                  spec:
+                    shell: Bash
+                    executionTarget: {}
+                    source:
+                      type: Inline
+                      spec:
+                        script: |-
+                          cd terraform
+                          terraform init
+                    environmentVariables: []
+                    outputVariables: []
+                  timeout: 5m
+              - step:
+                  type: ShellScript
+                  name: Terraform Plan
+                  identifier: Terraform_Plan
+                  spec:
+                    shell: Bash
+                    executionTarget: {}
+                    source:
+                      type: Inline
+                      spec:
+                        script: |-
+                          terraform plan \
+                              -var 'access_key=$ACCESS_KEY' \
+                              -var 'secret_key=$SECRET_KEY' \
+                              -out=tfplan
+                          terraform show tfplan
+                    environmentVariables:
+                      - name: ACCESS_KEY
+                        type: Secret
+                        value: account.demo-aws-access-key
+                      - name: SECRET_KEY
+                        type: Secret
+                        value: account.demo-aws-secret-key
+                    outputVariables: []
+                  timeout: 5m
+              - step:
+                  type: HarnessApproval
+                  name: Review Plan
+                  identifier: Review_Plan
+                  spec:
+                    approvalMessage: Please review the following plan and approve the pipeline progression
+                    includePipelineExecutionHistory: true
+                    isAutoRejectEnabled: true
+                    approvers:
+                      userGroups:
+                        - account._account_all_users
+                      minimumCount: 1
+                      disallowPipelineExecutor: false
+                    approverInputs: []
+                    callbackId: plan_approval
+                  timeout: 1d
+              - step:
+                  type: ShellScript
+                  name: Terraform Apply
+                  identifier: Terraform_Apply
+                  spec:
+                    shell: Bash
+                    executionTarget: {}
+                    source:
+                      type: Inline
+                      spec:
+                        script: terraform apply tfplan -auto-approve
+                    environmentVariables: []
+                    outputVariables: []
+                  timeout: 5m
+        tags: {}
+    - stage:
+        name: Application
+        identifier: Application
+        description: ""
+        type: Deployment
+        spec:
+          deploymentType: Kubernetes
+          service:
+            serviceRef: demoappservice
+            gitBranch: main
+          environment:
+            environmentRef: demoappenvironment
+            gitBranch: main
+            deployToAll: false
+            provisioner:
+              steps:
+                - step:
+                    type: TerraformPlan
+                    name: Terraform Plan
+                    identifier: Terraform_Plan
+                    timeout: 5m
+                    spec:
+                      provisionerIdentifier: terraform_plan
+                      configuration:
+                        command: Apply
+                        configFiles:
+                          store:
+                            spec:
+                              connectorRef: account.demogithubconnector
+                              gitFetchType: Branch
+                              branch: main
+                              folderPath: terraform
+                            type: Github
+                        providerCredential:
+                          type: Aws
+                          spec:
+                            connectorRef: account.demoawsconnector
+                            region: us-east-1
+                            roleArn: ""
+                        varFiles:
+                          - varFile:
+                              spec:
+                                content: |-
+                                  access_key=<+secrets.getValue("demo_aws_access_key")>
+                                  secret_key=<+secrets.getValue("demo_aws_secret_key")>
+                              identifier: tfvars
+                              type: Inline
+                        secretManagerRef: account.harnessSecretManager
+                        workspace: demo-app
+                        exportTerraformHumanReadablePlan: true
+                        skipRefreshCommand: false
+                - step:
+                    type: HarnessApproval
+                    name: Approve Plan
+                    identifier: Approve_Plan
+                    timeout: 1d
+                    spec:
+                      approvalMessage: Please review the associated Terraform plan and approve or reject
+                      includePipelineExecutionHistory: true
+                      approvers:
+                        userGroups:
+                          - account._account_all_users
+                        minimumCount: 1
+                        disallowPipelineExecutor: true
+                      approverInputs: []
+                      isAutoRejectEnabled: true
+                      callbackId: approve_plan
+                - step:
+                    type: TerraformApply
+                    name: Terraform Apply
+                    identifier: Terraform_Apply
+                    timeout: 5m
+                    spec:
+                      provisionerIdentifier: terraform_plan
+                      configuration:
+                        type: InheritFromPlan
+                        encryptOutput:
+                          outputSecretManagerRef: account.harnessSecretManager
+              rollbackSteps:
+                - step:
+                    type: TerraformRollback
+                    name: Terraform Rollback
+                    identifier: Terraform_Rollback
+                    timeout: 5m
+                    spec:
+                      provisionerIdentifier: terraform_rollback
+                      skipRefreshCommand: false
+            infrastructureDefinitions:
+              - identifier: demoappinfrastructure
+                inputs:
+                  identifier: demoappinfrastructure
+                  type: KubernetesAws
+                  spec:
+                    provisioner: <+input>
+          execution:
+            steps:
+              - step:
+                  name: Rollout Deployment
+                  identifier: rolloutDeployment
+                  type: K8sRollingDeploy
+                  timeout: 10m
+                  spec:
+                    skipDryRun: false
+                    pruningEnabled: false
+            rollbackSteps:
+              - step:
+                  name: Rollback Rollout Deployment
+                  identifier: rollbackRolloutDeployment
+                  type: K8sRollingRollback
+                  timeout: 10m
+                  spec:
+                    pruningEnabled: false
+        tags: {}
+        failureStrategies:
+          - onFailure:
+              errors:
+                - AllErrors
+              action:
+                type: StageRollback
+  properties:
+    ci:
+      codebase:
+        connectorRef: account.demogithubconnector
+        build: <+input>
