@@ -1,0 +1,8 @@
+environment:
+  name: demo-terraform-environment
+  identifier: demoterraformenvironment
+  description: ""
+  tags: {}
+  type: PreProduction
+  orgIdentifier: default
+  projectIdentifier: default_project
