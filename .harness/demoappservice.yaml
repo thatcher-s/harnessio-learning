@@ -1,0 +1,24 @@
+service:
+  name: demo-app-service
+  identifier: demoappservice
+  serviceDefinition:
+    type: Kubernetes
+    spec:
+      manifests:
+        - manifest:
+            identifier: app_manifest
+            type: K8sManifest
+            spec:
+              store:
+                type: Github
+                spec:
+                  connectorRef: account.demogithubconnector
+                  gitFetchType: Branch
+                  paths:
+                    - hello-world-k8s
+                  branch: main
+              skipResourceVersioning: false
+              enableDeclarativeRollback: false
+  gitOpsEnabled: false
+  orgIdentifier: default
+  projectIdentifier: default_project
